@@ -13,7 +13,7 @@ export default function Homepage() {
       <p className="max-w-xl text-gray-600 mb-8">
         Powered by advanced machine learning algorithms, our AI analyzes your pdf and tags it appropriately.
       </p>
-      <Button onClick={() => navigate("/design-jewelry")}>Get Started</Button>
+      <Button onClick={() => navigate("/ai-pdf-tagger")}>Get Started</Button>
     </div>
   )
 }
