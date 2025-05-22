@@ -10,19 +10,19 @@ const MODELS = {
   Google: ["Gemini Flash 2.0"],
 } as const
 
-export default function AIPDFConfiguration() {
+type Props = {
+  onGenerate: (file: File, aiProvider: string, model: string) => void
+}
+
+export default function AIPDFConfiguration({ onGenerate }: Props) {
   const [aiProvider, setAiProvider] = useState<typeof PROVIDERS[number]>("OpenAI")
-  const [model, setModel] = useState<string>(MODELS.OpenAI[0])
-  const [fileName, setFileName] = useState<string>("")
-  const [isUploading, setIsUploading] = useState<boolean>(false)
+  const [model, setModel]         = useState<string>(MODELS.OpenAI[0])
+  const [file, setFile]           = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setFileName(file.name)
-      setIsUploading(false)
-    }
+    const f = e.target.files?.[0] || null
+    setFile(f)
   }
 
   const triggerFilePicker = () => {
@@ -30,12 +30,9 @@ export default function AIPDFConfiguration() {
   }
 
   const handleGenerate = () => {
-    console.log("Generate Tagged PDF:", {
-      aiProvider,
-      model,
-      fileName,
-    })
-    alert(`(stub) Generating tags for ${fileName} using ${aiProvider}/${model}`)
+    if (file) {
+      onGenerate(file, aiProvider, model)
+    }
   }
 
   return (
@@ -56,18 +53,8 @@ export default function AIPDFConfiguration() {
           className="hidden"
           onChange={handleFileSelect}
         />
-        <Button
-          onClick={() => {
-            setIsUploading(true)
-            triggerFilePicker()
-          }}
-          disabled={isUploading}
-        >
-          {isUploading
-            ? "Uploading..."
-            : fileName
-            ? `Selected: ${fileName}`
-            : "Choose PDF"}
+        <Button onClick={triggerFilePicker}>
+          {file ? file.name : "Choose PDF"}
         </Button>
       </div>
 
@@ -118,10 +105,7 @@ export default function AIPDFConfiguration() {
 
       {/* Generate Button */}
       <div className="p-4 bg-white rounded-lg border border-gray-300 shadow-sm text-center">
-        <Button
-          onClick={handleGenerate}
-          disabled={!fileName}
-        >
+        <Button onClick={handleGenerate} disabled={!file}>
           Generate Tagged PDF
         </Button>
       </div>
