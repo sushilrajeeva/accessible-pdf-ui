@@ -1,7 +1,6 @@
 // src/components/navbar/Navbar.tsx
 import { Link } from "react-router-dom"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "../ui/button"
 import { NavLink } from "react-router-dom"
 
 export default function Navbar() {
