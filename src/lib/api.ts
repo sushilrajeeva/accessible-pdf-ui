@@ -9,8 +9,20 @@ export interface Region {
   tag: string;
 }
 
+export interface Metadata {
+    title: string;
+    author: string;
+    subject: string;
+    keywords: string;
+    creator: string;
+    producer: string;
+    creation_date: string;
+    mod_date: string;
+}
+
 export interface TagResponse {
   structure: Region[];
+  metadata: Metadata;
 }
 
 // Now VITE_API_URL should be like "http://127.0.0.1:8000/"
