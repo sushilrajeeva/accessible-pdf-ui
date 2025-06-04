@@ -1,8 +1,11 @@
 // src/components/pdfView/PDFMetadata.tsx
+import { useState } from "react";
 import type { Metadata } from "@/lib/api";
+import type { ChangeEvent } from "react";
 
 type Props = {
   metadata: Metadata;
+  onSave: (newMetadata: Metadata) => void;
 };
 
 /**
@@ -55,44 +58,98 @@ function formatPdfDate(raw: string): string {
   }
 }
 
-export default function PDFMetadata({ metadata }: Props) {
-  return (
-    <div className="mb-4 p-4 bg-gray-800 rounded-2xl shadow-lg border border-gray-700 text-gray-100">
-      <h3 className="text-lg font-semibold text-blue-300 mb-2">PDF Metadata</h3>
-      <dl className="grid grid-cols-1 gap-2 text-sm">
-        <div className="flex justify-between">
-          <dt className="font-medium text-green-300">Title:</dt>
-          <dd>{metadata.title?.trim() || "None"}</dd>
+export default function PDFMetadata({ metadata, onSave }: Props) {
+
+    // local copy of metadata fields so we can edit them
+  const [editMode, setEditMode] = useState(false);
+  const [localMeta, setLocalMeta] = useState<Metadata>({ ...metadata });
+
+  // Only these six keys will be editable
+  const EDITABLE_KEYS: Array<keyof Pick<
+    Metadata,
+    "title" | "author" | "subject" | "keywords" | "creator" | "producer"
+  >> = [
+    "title",
+    "author",
+    "subject",
+    "keywords",
+    "creator",
+    "producer",
+  ];
+
+  // Handle typing into text inputs
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setLocalMeta((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // When Save is clicked, propagate changes up
+  const handleSave = () => {
+    onSave(localMeta);
+    setEditMode(false);
+  };
+
+    return (
+        <div className="mb-4 p-4 bg-gray-800 rounded-2xl shadow-lg border border-gray-700 text-gray-100">
+            <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold text-blue-300 mb-2">
+                PDF Metadata
+            </h3>
+            {editMode ? (
+                <button
+                onClick={handleSave}
+                className="text-sm text-green-300 hover:underline"
+                >
+                Save
+                </button>
+            ) : (
+                <button
+                onClick={() => {
+                    setLocalMeta({ ...metadata });
+                    setEditMode(true);
+                }}
+                className="text-sm text-blue-300 hover:underline"
+                >
+                Edit
+                </button>
+            )}
+            </div>
+
+            <dl className="grid grid-cols-1 gap-2 text-sm">
+            {EDITABLE_KEYS.map((key) => (
+                <div className="flex justify-between" key={key}>
+                <dt className="font-medium text-green-300">
+                    {key.charAt(0).toUpperCase() + key.slice(1)}:
+                </dt>
+                {editMode ? (
+                    <dd className="w-2/3">
+                    <input
+                        type="text"
+                        name={key}
+                        value={localMeta[key] || ""}
+                        onChange={handleChange}
+                        className="w-full px-2 py-1 text-black rounded bg-gray-200"
+                    />
+                    </dd>
+                ) : (
+                    <dd>{metadata[key]?.trim() || "None"}</dd>
+                )}
+                </div>
+            ))}
+
+            <div className="flex justify-between">
+                <dt className="font-medium text-green-300">Creation Date:</dt>
+                <dd>{formatPdfDate(metadata.creation_date)}</dd>
+            </div>
+            <div className="flex justify-between">
+                <dt className="font-medium text-green-300">Modified Date:</dt>
+                <dd>{formatPdfDate(metadata.mod_date)}</dd>
+            </div>
+            </dl>
         </div>
-        <div className="flex justify-between">
-          <dt className="font-medium text-green-300">Author:</dt>
-          <dd>{metadata.author?.trim() || "None"}</dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="font-medium text-green-300">Subject:</dt>
-          <dd>{metadata.subject?.trim() || "None"}</dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="font-medium text-green-300">Keywords:</dt>
-          <dd>{metadata.keywords?.trim() || "None"}</dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="font-medium text-green-300">Creator:</dt>
-          <dd>{metadata.creator?.trim() || "None"}</dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="font-medium text-green-300">Producer:</dt>
-          <dd>{metadata.producer?.trim() || "None"}</dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="font-medium text-green-300">Creation Date:</dt>
-          <dd>{formatPdfDate(metadata.creation_date)}</dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="font-medium text-green-300">Modified Date:</dt>
-          <dd>{formatPdfDate(metadata.mod_date)}</dd>
-        </div>
-      </dl>
-    </div>
-  );
+    );
 }
+
