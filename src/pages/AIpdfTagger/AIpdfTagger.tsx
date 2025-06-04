@@ -2,14 +2,15 @@
 import { useState } from "react"
 import AIPDFConfiguration from "@/components/AIpdfConfiguration/AIpdfConfiguration"
 import PDFView from "@/components/pdfView/pdfView"
-import PDFMetadata from "@/components/pdfView/PDFMetadata"
-import type { TagResponse } from "@/lib/api"
+import MetadataDropdown from "@/components/pdfView/MetadataDropdown"
+import type { TagResponse, Metadata, } from "@/lib/api"
 import { uploadPdf }        from "@/lib/api"
 
 export default function AIpdfTagger() {
   const [tags, setTags]       = useState<TagResponse | null>(null)
   const [loading, setLoading] = useState(false)
 
+  // 1. Handling the initial upload & AI‐tag request
   const handleUploadAndTag = async (file: File) => {
     setLoading(true)
     try {
@@ -22,6 +23,29 @@ export default function AIpdfTagger() {
       setLoading(false)
     }
   }
+
+  // 2. When PDFMetadata child saves new metadata, update in state
+  const handleUpdateMetadata = (newMetadata: Metadata) => {
+    if (!tags) return;
+    setTags({
+      ...tags,
+      metadata: newMetadata,
+    });
+  };
+
+  // 3. When a RegionCard child saves a new tag, we need to know its index
+  const handleUpdateRegionTag = (index: number, newTag: string) => {
+    if (!tags) return;
+    const newStructure = [...tags.structure];
+    newStructure[index] = {
+      ...newStructure[index],
+      tag: newTag,
+    };
+    setTags({
+      ...tags,
+      structure: newStructure,
+    });
+  };
 
   return (
     // <div className="flex flex-col md:flex-row gap-6 p-6">
@@ -51,11 +75,16 @@ export default function AIpdfTagger() {
       <div style={{ flex: 7 }} className="flex flex-col">
         {/* Show metadata above the region cards */}
         {tags && tags.metadata && (
-          <PDFMetadata metadata={tags.metadata} />
+          <MetadataDropdown 
+              metadata={tags.metadata}
+              onSave={handleUpdateMetadata}/>
         )}
         {/* Then the region cards or skeleton */}
         <div className="flex-1 overflow-auto">
-          <PDFView data={tags} loading={loading} />
+          <PDFView 
+              data={tags}
+              loading={loading} 
+              onUpdateRegionTag={handleUpdateRegionTag} />
         </div>
       </div>
     </div>

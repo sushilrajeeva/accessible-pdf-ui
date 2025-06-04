@@ -1,5 +1,6 @@
 // src/components/pdfView/RegionCard.tsx
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { useState } from "react";
 
 export type Region = {
   page: number
@@ -10,35 +11,103 @@ export type Region = {
 }
 
 type Props = {
-  region: Region
+  region: Region;
+  index: number;
+  onSaveTag: (index: number, newTag: string) => void;
 }
 
-export default function RegionCard({ region }: Props) {
-  return (
-    <Card className="mb-4 bg-gray-800 text-gray-100">
-      <CardHeader className="border-b border-gray-700">
-        <CardTitle className="text-sm uppercase text-blue-400">
-          AI Tag: {region.tag}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2 text-xs">
-        <div>
-          <span className="font-medium text-green-300">Page:</span> {region.page}
-        </div>
-        <div>
-          <span className="font-medium text-green-300">Type:</span> {region.type}
-        </div>
-        <div>
-          <span className="font-medium text-green-300">Content:</span>
-          <p className="mt-1 px-2 py-1 bg-gray-700 rounded">{region.content}</p>
-        </div>
-        <div>
-          <span className="font-medium text-green-300">BBox:</span>
-          <code className="block mt-1 px-2 py-1 bg-gray-700 rounded">
-            [{region.bbox.map((n) => n.toFixed(1)).join(", ")}]
-          </code>
-        </div>
-      </CardContent>
-    </Card>
-  )
+// List of all valid tags for the dropdown:
+const ALL_TAGS = [
+  "title",
+  "subtitle",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "paragraph",
+  "image_caption",
+  "image",
+  "header",
+  "footer",
+  "form_label",
+  "checkbox",
+] as const;
+
+
+export default function RegionCard({ region, index, onSaveTag }: Props) {
+
+    const [editMode, setEditMode] = useState(false);
+    const [selectedTag, setSelectedTag] = useState<string>(region.tag);
+
+    const handleSave = () => {
+        onSaveTag(index, selectedTag);
+        setEditMode(false);
+    };
+
+
+    return (
+        <Card className="mb-4 bg-gray-800 text-gray-100">
+        <CardHeader className="border-b border-gray-700 flex justify-between items-center">
+            <CardTitle className="text-sm uppercase text-blue-400">
+            AI Tag:
+            {editMode ? (
+                <select
+                className="ml-2 bg-gray-700 text-white text-xs rounded px-2 py-1"
+                value={selectedTag}
+                onChange={(e) => setSelectedTag(e.target.value)}
+                >
+                {ALL_TAGS.map((t) => (
+                    <option key={t} value={t}>
+                    {t}
+                    </option>
+                ))}
+                </select>
+            ) : (
+                <span className="ml-1">{region.tag}</span>
+            )}
+            </CardTitle>
+
+            {editMode ? (
+            <button
+                onClick={handleSave}
+                className="text-sm text-green-300 hover:underline"
+            >
+                Save
+            </button>
+            ) : (
+            <button
+                onClick={() => setEditMode(true)}
+                className="text-sm text-blue-300 hover:underline"
+            >
+                Edit
+            </button>
+            )}
+        </CardHeader>
+
+        <CardContent className="space-y-2 text-xs">
+            <div>
+            <span className="font-medium text-green-300">Page:</span>{" "}
+            {region.page}
+            </div>
+            <div>
+            <span className="font-medium text-green-300">Type:</span>{" "}
+            {region.type}
+            </div>
+            <div>
+            <span className="font-medium text-green-300">Content:</span>
+            <p className="mt-1 px-2 py-1 bg-gray-700 rounded">
+                {region.content}
+            </p>
+            </div>
+            <div>
+            <span className="font-medium text-green-300">BBox:</span>
+            <code className="block mt-1 px-2 py-1 bg-gray-700 rounded">
+                [{region.bbox.map((n) => n.toFixed(1)).join(", ")}]
+            </code>
+            </div>
+        </CardContent>
+        </Card>
+    );
 }

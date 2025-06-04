@@ -6,9 +6,10 @@ import type { Metadata } from "@/lib/api";
 
 type Props = {
   metadata: Metadata;
+  onSave: (newMetadata: Metadata) => void;
 }
 
-export default function MetadataDropdown({ metadata }: Props) {
+export default function MetadataDropdown({ metadata, onSave }: Props) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -24,9 +25,11 @@ export default function MetadataDropdown({ metadata }: Props) {
           <ChevronDown className="h-4 w-4 text-gray-400" />
         )}
       </button>
+
       {isOpen && (
         <div className="mt-2">
-          <PDFMetadata metadata={metadata} />
+          {/* Pass onSave down to PDFMetadata */}
+          <PDFMetadata metadata={metadata} onSave={onSave} />
         </div>
       )}
     </div>
