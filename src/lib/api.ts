@@ -1,15 +1,29 @@
 // src/lib/api.ts
 import axios from "axios";
 
+export interface Span {
+    text: string;
+    font: string;
+    size: number;
+    bbox: number[];
+    color: number[];
+}
+
 export interface Region {
   page: number;
   type: string;
   content: string;
   bbox: number[];
   tag: string;
+  spans?: Span[];
+  xref?: number;
+  raw_png?: string;
+  image_width?: number;
+  image_height?: number;
 }
 
 export interface Metadata {
+    filename: string;
     title: string;
     author: string;
     subject: string;
@@ -21,8 +35,9 @@ export interface Metadata {
 }
 
 export interface TagResponse {
-  structure: Region[];
-  metadata: Metadata;
+    pages: { page: number; width: number; height: number }[];
+    structure: Region[];
+    metadata: Metadata;
 }
 
 // Now VITE_API_URL should be like "http://127.0.0.1:8000/"

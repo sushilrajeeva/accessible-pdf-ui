@@ -119,6 +119,11 @@ export default function PDFMetadata({ metadata, onSave }: Props) {
             </div>
 
             <dl className="grid grid-cols-1 gap-2 text-sm">
+            {/* new filename row */}
+            <div className="flex justify-between">
+                <dt className="font-medium text-green-300">Filename:</dt>
+                <dd>{metadata.filename}</dd>
+            </div>
             {EDITABLE_KEYS.map((key) => (
                 <div className="flex justify-between" key={key}>
                 <dt className="font-medium text-green-300">
