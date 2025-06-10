@@ -89,14 +89,14 @@ export default function AIpdfTagger() {
         )}
         {/* Then the region cards or skeleton */}
         
-        {tags && tags.structure && (
-          <div className="flex-1 overflow-auto mt-4">
+        
+        <div className="flex-1 overflow-auto mt-4">
           <PDFView 
               data={tags}
               loading={loading} 
               onUpdateRegionTag={handleUpdateRegionTag} />
         </div>
-        )}
+        
       </div>
     </div>
 
