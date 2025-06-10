@@ -3,8 +3,10 @@ import { useState } from "react"
 import AIPDFConfiguration from "@/components/AIpdfConfiguration/AIpdfConfiguration"
 import PDFView from "@/components/pdfView/pdfView"
 import MetadataDropdown from "@/components/pdfView/MetadataDropdown"
-import type { TagResponse, Metadata, } from "@/lib/api"
-import { uploadPdf }        from "@/lib/api"
+import type { TagResponse } from "@/models/TagResponse"
+import type { Metadata } from "@/models/Metadata"
+import { uploadPdf } from "@/lib/api"
+import GenerateDialog from "@/components/GeneratePDF/GenerateDialog"
 
 export default function AIpdfTagger() {
   const [tags, setTags]       = useState<TagResponse | null>(null)
@@ -74,18 +76,27 @@ export default function AIpdfTagger() {
       {/* Right: show metadata (if available), then PDFView */}
       <div style={{ flex: 7 }} className="flex flex-col">
         {/* Show metadata above the region cards */}
+        {/* Generate JSON dialog shows current tags */}
+
         {tags && tags.metadata && (
-          <MetadataDropdown 
+          <GenerateDialog triggerLabel = "Generate PDF" data={tags} />
+        )}
+        
+        {tags && tags.metadata && (
+          <MetadataDropdown
               metadata={tags.metadata}
               onSave={handleUpdateMetadata}/>
         )}
         {/* Then the region cards or skeleton */}
-        <div className="flex-1 overflow-auto">
+        
+        {tags && tags.structure && (
+          <div className="flex-1 overflow-auto mt-4">
           <PDFView 
               data={tags}
               loading={loading} 
               onUpdateRegionTag={handleUpdateRegionTag} />
         </div>
+        )}
       </div>
     </div>
 

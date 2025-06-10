@@ -1,44 +1,7 @@
 // src/lib/api.ts
 import axios from "axios";
 
-export interface Span {
-    text: string;
-    font: string;
-    size: number;
-    bbox: number[];
-    color: number[];
-}
-
-export interface Region {
-  page: number;
-  type: string;
-  content: string;
-  bbox: number[];
-  tag: string;
-  spans?: Span[];
-  xref?: number;
-  raw_png?: string;
-  image_width?: number;
-  image_height?: number;
-}
-
-export interface Metadata {
-    filename: string;
-    title: string;
-    author: string;
-    subject: string;
-    keywords: string;
-    creator: string;
-    producer: string;
-    creation_date: string;
-    mod_date: string;
-}
-
-export interface TagResponse {
-    pages: { page: number; width: number; height: number }[];
-    structure: Region[];
-    metadata: Metadata;
-}
+import type { TagResponse } from "@/models/TagResponse";
 
 // Now VITE_API_URL should be like "http://127.0.0.1:8000/"
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
@@ -55,4 +18,25 @@ export async function uploadPdf(file: File): Promise<TagResponse> {
     }
   );
   return data;
+}
+
+/**
+ * Send the reviewed tags + metadata back to the backend to generate
+ * an accessible PDF. Expects the identical JSON shape of TagResponse.
+ * Returns the raw PDF blob.
+ */
+
+export async function generatePdf(payload: TagResponse): Promise<Blob> {
+
+    const { data } = await axios.post<Blob>(
+        `${API_BASE}api/generate_pdf`,
+        payload,
+        {
+            responseType: "blob",
+            headers: { "Content-Type": "application/json" },
+        }
+    );
+
+    return data;
+    
 }

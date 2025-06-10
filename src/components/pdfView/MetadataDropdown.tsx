@@ -2,7 +2,7 @@
 import { useState } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import PDFMetadata from "./PDFMetadata"
-import type { Metadata } from "@/lib/api";
+import type { Metadata } from "@/models/Metadata"
 
 type Props = {
   metadata: Metadata;

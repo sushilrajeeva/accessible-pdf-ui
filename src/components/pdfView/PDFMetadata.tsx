@@ -1,6 +1,6 @@
 // src/components/pdfView/PDFMetadata.tsx
 import { useState } from "react";
-import type { Metadata } from "@/lib/api";
+import type { Metadata } from "@/models/Metadata";
 import type { ChangeEvent } from "react";
 
 type Props = {
