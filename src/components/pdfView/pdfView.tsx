@@ -1,6 +1,6 @@
 // src/components/pdfView/PDFView.tsx
 import { Skeleton } from "@/components/ui/skeleton"
-import type { TagResponse } from "@/lib/api"
+import type { TagResponse } from "@/models/TagResponse";
 
 import RegionCard from "./RegionCard"
 import type { Region } from "./RegionCard"
